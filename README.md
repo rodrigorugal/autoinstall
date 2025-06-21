@@ -1,0 +1,2 @@
+# autoinstall
+Ubuntu autoinstall
