@@ -1,0 +1,35 @@
+#cloud-config
+autoinstall:
+    version: 1
+    identity:
+        realname: 'Rodrigo'
+        hostname: rugalpc
+        username: rodrigo
+        password: '$y$j9T$LrvsSEmGIE6LllmJwiMsK1$X1Kf1xarN4YwchATB2WHJwZ7rJsavqhNzVSOdTY.aX8' # rodrigo321
+    locale: pt_BR.utf8
+    keyboard:
+        layout: br
+    timezone: "America/Sao_Paulo"   
+    packages:
+        - gimp
+        - git
+        - wget
+        - code
+        - obsidian
+        - discord
+        - gparted
+        - dbeaver-ce
+        - steam
+        - virtualbox
+        - virtualbox-ext-pack
+    snaps:
+        - name: spotify
+          channel: stable
+          classic: false
+    codecs:
+        install: true
+    drivers:
+        install: true
+    updates: all
+    shutdown: reboot
+
