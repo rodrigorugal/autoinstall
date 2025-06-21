@@ -1,35 +1,97 @@
 #cloud-config
 autoinstall:
-    version: 1
-    identity:
-        realname: 'Rodrigo'
-        hostname: rugalpc
-        username: rodrigo
-        password: '$y$j9T$LrvsSEmGIE6LllmJwiMsK1$X1Kf1xarN4YwchATB2WHJwZ7rJsavqhNzVSOdTY.aX8' # rodrigo321
-    locale: pt_BR.utf8
-    keyboard:
-        layout: br
-    timezone: "America/Sao_Paulo"   
+  version: 1
+  early-commands:
+    - sudo systemctl stop ssh || true
+  
+  identity:
+    realname: "Rodrigo"
+    hostname: rugalpc
+    username: rodrigo
+    password: "$y$j9T$LrvsSEmGIE6LllmJwiMsK1$X1Kf1xarN4YwchATB2WHJwZ7rJsavqhNzVSOdTY.aX8"
+  
+  locale: pt_BR.UTF-8
+  keyboard:
+    layout: br
+  timezone: America/Sao_Paulo
+  
+  network:
+    version: 2
+    ethernets:
+      enp0s3:
+        dhcp4: true
+        dhcp6: true
+  
+  storage:
+    config:
+      - type: disk
+        id: disk-sda
+        ptable: gpt
+        wipe: superblock
+        grub_device: true
+      - type: partition
+        id: partition-1
+        device: disk-sda
+        size: 500M
+        flag: boot
+      - type: partition
+        id: partition-2
+        device: disk-sda
+        size: -1
+  
+  packages:
+    - gimp
+    - git
+    - wget
+    - code
+    - obsidian
+    - discord
+    - gparted
+    - dbeaver-ce
+    - steam
+    - virtualbox
+    - virtualbox-ext-pack
+    - build-essential
+    - dkms
+    - linux-headers-generic
+    - curl
+    - ubuntu-restricted-extras
+    - flatpak
+    - gnome-software-plugin-flatpak
+  
+  snaps:
+    - name: spotify
+      channel: stable
+      classic: true
+    - name: code
+      channel: stable
+      classic: true
+  
+  late-commands:
+    - |
+      curtin in-target --target=/target -- flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+      curtin in-target --target=/target -- flatpak update -y
+    - |
+      curtin in-target --target=/target -- usermod -aG vboxusers rodrigo
+      curtin in-target --target=/target -- systemctl enable --now virtualbox.service
+    - |
+      curtin in-target --target=/target -- apt-get remove -y ubuntu-advantage-tools || true
+      curtin in-target --target=/target -- apt-mark hold virtualbox virtualbox-ext-pack
+      curtin in-target --target=/target -- apt autoremove -y
+  
+  error-commands:
+    - |
+      logger -t autoinstall "Erro durante a instalação"
+      curl -X POST https://api.example.com/log --data "error=install_failed" || true
+  
+  user-data:
+    disable_root: false
+    automatic_login: true
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    package_update: true
+    package_upgrade: true
     packages:
-        - gimp
-        - git
-        - wget
-        - code
-        - obsidian
-        - discord
-        - gparted
-        - dbeaver-ce
-        - steam
-        - virtualbox
-        - virtualbox-ext-pack
-    snaps:
-        - name: spotify
-          channel: stable
-          classic: false
-    codecs:
-        install: true
-    drivers:
-        install: true
-    updates: all
-    shutdown: reboot
-
+      - neofetch
+      - htop
+    runcmd:
+      - [flatpak, install, -y, flathub, org.telegram.desktop]
